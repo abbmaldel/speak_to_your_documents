@@ -1,0 +1,68 @@
+
+<script lang='ts'>
+    let search = $state('')
+    let allowSend = $state(true)
+    let lastElement = $state<null|HTMLElement>(null)
+
+    let messageList = $state<{ text: string, sentByUser: boolean, sentAt: Date }[]>([])
+
+    $effect(() => {
+        if(lastElement) {
+            lastElement.scrollIntoView({behavior: 'smooth'})
+        }
+	});
+
+    function onkeyenter(event: KeyboardEvent) {
+        console.log(event)
+        if (event.key === "Enter" && !event.shiftKey) {
+                event.preventDefault()
+            if(allowSend) {
+                console.log('Påbörja sökning')
+                messageList.push({text: search, sentByUser: true, sentAt: new Date()})
+                search = ''
+                allowSend = false
+                setTimeout(() => {
+                    messageList.push({text: 'Jag är din AI!', sentByUser: false, sentAt: new Date()})
+                    allowSend = true
+                }, 1000)
+            }
+
+            }
+        }
+            
+</script>
+
+
+<div class="h-screen flex flex-col">
+<h1 class=" text-center text-3xl p-20">Börja undersöka dina dokument</h1>
+<div class="w-full h-full flex flex-col items-center justify-end pb-10 ">
+    <div class="w-[800px] h-full flex flex-col items-center justify-end">
+        <div class="w-full h-[70vh] flex flex-col overflow-y-scroll auto scrollbar-hidden" >
+        {#each messageList as message, i}
+        {#if i == messageList.length - 1}
+        <div class={`flex flex-col   my-1 ${message.sentByUser ? 'self-end items-end ' : 'self-start items-start '}`} bind:this={lastElement}>
+            <p class="text-gray-500 text-sm">{message.sentAt.toLocaleTimeString([],{timeStyle: "short"})}</p>
+        <div class={`rounded-3xl px-3 flex flex-row items-center justify-between py-2  ${message.sentByUser ? ' bg-red-500 text-white' : 'bg-white-300 border border-black text-black'}`}>
+            <p>{message.text}</p>
+        </div>
+        </div>
+        {:else}
+        <div class={`flex flex-col   my-1 ${message.sentByUser ? 'self-end items-end ' : 'self-start items-start '}`}>
+            <p class="text-gray-500 text-sm">{message.sentAt.toLocaleTimeString([],{timeStyle: "short"})}</p>
+        <div class={`rounded-3xl px-3 flex flex-row items-center justify-between py-2  ${message.sentByUser ? ' bg-red-500 text-white' : 'bg-white-300 border border-black text-black'}`}>
+            <p>{message.text}</p>
+        </div>
+        </div>
+        {/if}
+    {/each}
+    </div>
+    <div class="border border-gray-300 rounded-3xl px-3 w-full flex flex-row items-center justify-between py-2 ">
+        <p id="search" onkeydown={onkeyenter} contenteditable bind:innerText={search} class=" w-10/12 outline-none" ></p>
+        <p class={search.length==0 ? ' block absolute -z-10 text-gray-500' : 'hidden'} >Börja din sökning</p>
+        <button class=" text-red-500 rounded-3xl h-9 self-end w-1/12" onclick={() => console.log(search)}>Sök</button>
+    </div>
+    </div>
+   
+</div>
+</div>
+

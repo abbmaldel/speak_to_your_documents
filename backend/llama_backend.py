@@ -1,11 +1,16 @@
 import ollama
-from git_repo.backend.Vector_database_backend import vector_data_base
-from dataclasses import dataclass
+from Vector_database_backend import vector_data_base
 
 
 class Chat:
-    def __init__(self, SSID, model: str = "llama3.2", options: dict = {}) -> None:
-        self.messages = []
+    def __init__(
+        self,
+        SSID,
+        model: str = "llama3.2",
+        options: dict = {},
+        system_message: str = "You're jobb is to take out information from the given documents",
+    ) -> None:
+        self.messages = [{"role": "system", "content": system_message}]
         self.model = model
         self.options = options
         self.SSID = SSID

@@ -12,21 +12,32 @@ class vector_data_base:
         )  # probably should be a persistent client but I digress
 
     def vectorize_string(
-        self, string: str, SSID: str, name: str, split: int = 100, overlap: int = 25
+        self, string: str, SSID: str, name: str, split: int = 1000, overlap: int = 250
     ) -> None:
+        asdf = True
         """sttring should be the whole document as a string, SSID for the session ID, split is the amount oof chars in a single embedding, overlap is the amount of overlap in chars inm each embedding"""
         if not SSID in self.SSID_vectordatabase:
             self.SSID_vectordatabase[SSID] = self.client.create_collection(name=SSID)
         embedding = []
         test_eqvuilant = []
-        for k, j in enumerate(
-            [string[i - overlap : i + overlap] for i in range(0, len(string), split)]
+        for _, j in enumerate(
+            [
+                string[max(i - overlap, 0) : i + split + overlap]
+                for i in range(0, len(string), split)
+            ]
         ):  # the monster!
+
             response = ollama.embeddings(
                 model="mxbai-embed-large", prompt=j
             )  # should add some way to refrence the original document
+
             embedding.append(response["embedding"])
+            if asdf:
+                print(response["embedding"])
+                print(j)
+                asdf = False
             test_eqvuilant.append(j)
+
         self.SSID_vectordatabase[SSID].add(
             ids=ULIDGenerator(len(test_eqvuilant)),
             embeddings=embedding,

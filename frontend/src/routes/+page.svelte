@@ -26,19 +26,23 @@
         }
     }   
 
+    function searchDocument() {
+        messageList.push({text: search, sentBy: "user", sentAt: new Date()})
+        search = ''
+        allowSend = false
+        setTimeout(() => {
+                messageList.push({text: 'Jag är din AI!', sentBy: "ai", sentAt: new Date()})
+                allowSend = true
+            }, 1000)
+    }
+
     function onkeyenter(event: KeyboardEvent) {
     console.log(event)
     if (event.key === "Enter" && !event.shiftKey) {
         event.preventDefault()
         if(allowSend) {
-            console.log('Påbörja sökning')
-            messageList.push({text: search, sentBy: "user", sentAt: new Date()})
-            search = ''
-            allowSend = false
-            setTimeout(() => {
-                messageList.push({text: 'Jag är din AI!', sentBy: "ai", sentAt: new Date()})
-                allowSend = true
-            }, 1000)
+           searchDocument()
+            
             }
 
             }
@@ -90,7 +94,7 @@
     <div class="border border-gray-300 rounded-3xl px-3 w-full flex flex-row items-center justify-between py-2 ">
         <p id="search" onkeydown={onkeyenter} contenteditable bind:innerText={search} class=" w-10/12 outline-none" ></p>
         <p class={search.length==0 ? ' block absolute -z-10 text-gray-500' : 'hidden'} >Börja din sökning</p>
-        <button class=" text-red-500 rounded-3xl h-9 self-end w-1/12" onclick={() => console.log(search)}>Sök</button>
+        <button class=" text-red-500 rounded-3xl h-9 self-end w-1/12" onclick={searchDocument}>Sök</button>
     </div>
     </div>
     </div>

@@ -26,6 +26,32 @@ def get_messages(SSID):
     return jsonify(sessions[SSID].messages)
 
 
+@app.route("/api/messages/<SSID>", methods=["PUT"])
+def get_messages(SSID):
+    if not SSID in sessions:
+        sessions[SSID] = Chat(SSID=SSID)
+    return jsonify(sessions[SSID].messages)
+
+
+@app.route("/documents/<SSID>", methods=["POST"])
+def documents(SSID):
+    if request.method == "POST":
+        file = request.files["file"]
+
+        _, file_extension = os.path.splitext(file.filename)
+
+        match file_extension:
+            case ".txt":
+                database.vectorize_string(file.read(), SSID, file.filename)
+            case ".pdf":
+                string = ""
+                for i in PyPDF2.PdfReader(file).pages:
+                    string += i.extract_text()
+                database.vectorize_string(string, SSID, file.filename)
+            case _:
+                raise ("Unkown filetype")
+
+
 @socketio.on("connect")
 def on_connect():
     user = session.get("SSID")

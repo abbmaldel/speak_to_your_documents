@@ -26,13 +26,6 @@ def get_messages(SSID):
     return jsonify(sessions[SSID].messages)
 
 
-@app.route("/api/messages/<SSID>", methods=["PUT"])
-def get_messages(SSID):
-    if not SSID in sessions:
-        sessions[SSID] = Chat(SSID=SSID)
-    return jsonify(sessions[SSID].messages)
-
-
 @app.route("/documents/<SSID>", methods=["POST"])
 def documents(SSID):
     if request.method == "POST":

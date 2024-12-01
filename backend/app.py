@@ -35,7 +35,9 @@ def documents(SSID):
 
         match file_extension:
             case ".txt":
-                database.vectorize_string(file.read(), SSID, file.filename)
+                database.vectorize_string(
+                    file.read().decode("utf-8"), SSID, file.filename
+                )
             case ".pdf":
                 string = ""
                 for i in PyPDF2.PdfReader(file).pages:
@@ -67,15 +69,16 @@ def on_disconnect():
 @socketio.on("send_message")
 def handle_send_message(data, look_up):
     sender = session.get("SSID")
-    answer = sessions[sender].send_message(data, look_up, database)
 
     if not sender:
         return jsonify({"error": "User not logged in"}), 400
+    if not sender in session:
+        session[sender] = Chat()
+    answer = sessions[sender].send_message(data, look_up, database)
+    # content = data.get("content")
 
-    content = data.get("content")
-
-    if not content:
-        return jsonify({"error": "Receiver and content are required"}), 400
+    # if not content:
+    #    return jsonify({"error": "Receiver and content are required"}), 400
 
     # Emit message to the receiver (send to their WebSocket room)
     if sender in user_rooms:

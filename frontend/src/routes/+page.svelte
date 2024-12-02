@@ -1,5 +1,10 @@
 
 <script lang='ts'>
+    import { io } from "socket.io-client";
+
+
+    const socket_url = "http://localhost:3000"; // does not work at the moment, needs to be changed to the server's url
+    const socket = io(socket_url);
     let search = $state('')
     let allowSend = $state(true)
     let lastElement = $state<null|HTMLElement>(null)
@@ -27,6 +32,7 @@
     }   
 
     function searchDocument() {
+        socket.emit('send_message', search, false);
         messageList.push({text: search, sentBy: "user", sentAt: new Date()})
         search = ''
         allowSend = false
@@ -35,6 +41,12 @@
                 allowSend = true
             }, 1000)
     }
+   
+    socket.on("new_message", ({answer}) => {
+        messageList.push({text: answer, sentBy: "ai", sentAt: new Date()})
+    })
+
+
 
     function onkeyenter(event: KeyboardEvent) {
     console.log(event)

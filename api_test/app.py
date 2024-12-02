@@ -1,13 +1,9 @@
 from flask import Flask, render_template, request, jsonify, session
 from flask_socketio import SocketIO, emit, join_room, leave_room
-from llama_backend import Chat
-from chromadb.errors import InvalidCollectionException
-from Vector_database_backend import vector_data_base
 import os
 import PyPDF2
 
 
-database = vector_data_base()
 sessions = {}
 user_rooms = {}
 
@@ -21,9 +17,13 @@ messages = []
 # API to get all chat messages
 @app.route("/api/messages/<SSID>", methods=["GET"])
 def get_messages(SSID):
-    if not SSID in sessions:
-        sessions[SSID] = Chat(SSID=SSID)
-    return jsonify(sessions[SSID].messages)
+
+    return jsonify(
+        [
+            {"role": "system", "content": "system_message"},
+            {"role": "user", "content": "Test string"},
+        ].messages
+    )
 
 
 @app.route("/documents/<SSID>", methods=["POST"])
@@ -35,14 +35,9 @@ def documents(SSID):
 
         match file_extension:
             case ".txt":
-                database.vectorize_string(
-                    file.read().decode("utf-8"), SSID, file.filename
-                )
+                pass
             case ".pdf":
-                string = ""
-                for i in PyPDF2.PdfReader(file).pages:
-                    string += i.extract_text()
-                database.vectorize_string(string, SSID, file.filename)
+                pass
             case _:
                 raise ("Unkown filetype")
 
@@ -72,9 +67,7 @@ def handle_send_message(data, look_up):
     sender = "test"
     if not sender:
         return jsonify({"error": "User not logged in"}), 400
-    if not sender in session:
-        session[sender] = Chat()
-    answer = sessions[sender].send_message(data, look_up, database)
+    answer = "just a test answer"
     # content = data.get("content")
 
     # if not content:

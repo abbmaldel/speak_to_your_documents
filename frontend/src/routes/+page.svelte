@@ -3,7 +3,7 @@
     import { io } from "socket.io-client";
 
 
-    const socket_url = "http://localhost:3000"; // does not work at the moment, needs to be changed to the server's url
+    const socket_url = "http://127.0.0.1:5000"; // does not work at the moment, needs to be changed to the server's url
     const socket = io(socket_url);
     let search = $state('')
     let allowSend = $state(true)

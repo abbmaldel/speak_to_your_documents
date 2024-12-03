@@ -46,6 +46,15 @@ def main():
                 except FileNotFoundError:
                     print("file not found")
             case "C":
+                for i in session.messages:
+                    match i["role"]:
+                        case "system":
+                            pass
+                        case "user":
+                            print(f"User : {i["content"]}")
+                        case "assistant":
+                            print(f"Assistant : {i["content"]}")
+
                 print(
                     "print \"exit\" to exit\nstart the message with '?' for a look up"
                 )
@@ -64,6 +73,7 @@ def main():
                         print(f"Assistant : {answer}")
                     except InvalidCollectionException:
                         print("No imported documents")
+
             case "!":
                 if "y" == input("Are you sure? (N/y) : ")[0].lower():
                     database.delete_data(SSID=session.SSID)

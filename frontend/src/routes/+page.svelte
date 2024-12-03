@@ -3,7 +3,7 @@
     import { io } from "socket.io-client";
 
 
-    const socket_url = "http://127.0.0.1:5000"; // does not work at the moment, needs to be changed to the server's url
+    const socket_url = "http://127.0.0.1:5000/"; // does not work at the moment, needs to be changed to the server's url
     const socket = io(socket_url);
     let search = $state('')
     let allowSend = $state(true)
@@ -12,11 +12,14 @@
 
     let messageList = $state<{ text: string, sentBy: "user"|"ai"|"info", sentAt: Date, file?:  any}[]>([])
 
+
     $effect(() => {
         if(lastElement) {
             lastElement.scrollIntoView({behavior: 'smooth'})
         }
 	});
+
+    
 
     function uploadFile() {
         if(fileInput) {
@@ -36,15 +39,17 @@
         messageList.push({text: search, sentBy: "user", sentAt: new Date()})
         search = ''
         allowSend = false
-        setTimeout(() => {
-                messageList.push({text: 'Jag är din AI!', sentBy: "ai", sentAt: new Date()})
-                allowSend = true
-            }, 1000)
     }
    
-    socket.on("new_message", ({answer}) => {
-        messageList.push({text: answer, sentBy: "ai", sentAt: new Date()})
+    socket.on("new_message", ({content}) => {
+        messageList.push({text: content, sentBy: "ai", sentAt: new Date()})
+        allowSend = true
     })
+
+    socket.on("connect", () => {
+  console.log("socket id", socket.id);
+});
+
 
 
 

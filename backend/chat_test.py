@@ -29,12 +29,12 @@ def main():
 
                     match file_extension:
                         case ".txt":
-                            with open(filename + file_extension, "rb") as file:
+                            with open(filename + file_extension, "r") as file:
                                 database.vectorize_string(
                                     file.read(), session.SSID, input("Document name : ")
                                 )
                         case ".pdf":
-                            with open(filename + file_extension, "r") as file:
+                            with open(filename + file_extension, "rb") as file:
                                 string = ""
                                 for i in PyPDF2.PdfReader(file).pages:
                                     string += i.extract_text()

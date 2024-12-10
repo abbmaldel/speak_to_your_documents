@@ -7,7 +7,7 @@ from uuid import uuid4
 
 class Database:
     def __init__(self, database_location: str) -> None:
-        self._conn = sqlite3.connect(database_location)
+        self._conn = sqlite3.connect(database_location, check_same_thread=False)
         self._cursor = self._conn.cursor()
         self._cursor.execute(
             f"""CREATE TABLE IF NOT EXISTS messages
@@ -31,7 +31,7 @@ class Database:
         )
         return [{"role": i, "content": j} for i, j in a]
 
-    def __drop_table(self):
+    def drop_table(self):
         self._cursor.executescript(
             "PRAGMA foreign_keys = OFF;DROP TABLE messages;PRAGMA foreign_keys = OFF;"
         )
@@ -51,9 +51,12 @@ class Database:
 
 
 def main():
+
     with Database("../databases/messages.db") as test_base:
-        test_base.store_message("test", "user", "testing testing!")
-        print(test_base.get_messages("test"))
+        pass
+        # test_base.drop_table()
+        # test_base.store_message("test", "user", "testing testing!")
+        # print(test_base.get_messages("test"))
 
 
 if __name__ == "__main__":

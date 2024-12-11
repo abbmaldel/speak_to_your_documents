@@ -45,6 +45,7 @@ def documents(SSID):
 
 @socketio.on("connect")
 def on_connect():
+    print("Request on connect", request.sid)
     session["SSID"] = str(uuid4())
     user = session.get("SSID")
     print(session)

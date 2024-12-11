@@ -70,7 +70,7 @@
 
 <div class="h-screen flex flex-col">
 <h1 class=" text-center text-3xl p-20">Börja undersöka dina dokument</h1>
-<div class="w-full h-full flex flex-col items-center justify-end pb-10 ">
+<div class="w-full flex flex-col items-center justify-end pb-10 ">
     <div class="w-[800px] h-full flex flex-col items-center justify-end">
         <div class="w-full h-[70vh] flex flex-col overflow-y-scroll auto scrollbar-hidden" >
         {#each messageList as message, i}

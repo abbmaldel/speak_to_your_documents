@@ -26,6 +26,8 @@
  * ```
  */
 declare module '$env/static/private' {
+	export const GOOGLE_CLIENT_ID: string;
+	export const GOOGLE_CLIENT_SECRET: string;
 	export const TERM_PROGRAM: string;
 	export const NODE: string;
 	export const INIT_CWD: string;
@@ -40,6 +42,7 @@ declare module '$env/static/private' {
 	export const ORIGINAL_XDG_CURRENT_DESKTOP: string;
 	export const MallocNanoZone: string;
 	export const COLOR: string;
+	export const TERM_SESSION_ID: string;
 	export const npm_config_noproxy: string;
 	export const npm_config_local_prefix: string;
 	export const USER: string;
@@ -86,8 +89,8 @@ declare module '$env/static/private' {
 	export const npm_config_user_agent: string;
 	export const VSCODE_GIT_ASKPASS_NODE: string;
 	export const GIT_ASKPASS: string;
-	export const INFOPATH: string;
 	export const HOMEBREW_CELLAR: string;
+	export const INFOPATH: string;
 	export const RUBYOPT: string;
 	export const RUBY_VERSION: string;
 	export const SECURITYSESSIONID: string;
@@ -127,6 +130,8 @@ declare module '$env/static/public' {
  */
 declare module '$env/dynamic/private' {
 	export const env: {
+		GOOGLE_CLIENT_ID: string;
+		GOOGLE_CLIENT_SECRET: string;
 		TERM_PROGRAM: string;
 		NODE: string;
 		INIT_CWD: string;
@@ -141,6 +146,7 @@ declare module '$env/dynamic/private' {
 		ORIGINAL_XDG_CURRENT_DESKTOP: string;
 		MallocNanoZone: string;
 		COLOR: string;
+		TERM_SESSION_ID: string;
 		npm_config_noproxy: string;
 		npm_config_local_prefix: string;
 		USER: string;
@@ -187,8 +193,8 @@ declare module '$env/dynamic/private' {
 		npm_config_user_agent: string;
 		VSCODE_GIT_ASKPASS_NODE: string;
 		GIT_ASKPASS: string;
-		INFOPATH: string;
 		HOMEBREW_CELLAR: string;
+		INFOPATH: string;
 		RUBYOPT: string;
 		RUBY_VERSION: string;
 		SECURITYSESSIONID: string;

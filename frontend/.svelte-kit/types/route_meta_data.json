@@ -1,3 +1,12 @@
 {
-	"/": []
+	"/": [
+		"src/routes/+page.server.ts"
+	],
+	"/login": [],
+	"/login/google": [
+		"src/routes/login/google/+server.ts"
+	],
+	"/login/google/callback": [
+		"src/routes/login/google/callback/+server.ts"
+	]
 }

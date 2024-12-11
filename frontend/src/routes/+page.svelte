@@ -1,4 +1,6 @@
 
+
+
 <script lang='ts'>
     import { browser } from '$app/environment'; 
     import { io } from "socket.io-client";
@@ -11,6 +13,9 @@
     let allowSend = $state(true)
     let lastElement = $state<null|HTMLElement>(null)
     let fileInput = $state<null|HTMLInputElement>(null)
+    let fileAvailable = $state(false)
+    let searchingEnabled = $state(false)
+    let commandMode = $state(false)
 
     let messageList = $state<{ text: string, sentBy: "user"|"ai"|"info", sentAt: Date, file?:  any}[]>([])
 
@@ -58,6 +63,7 @@
         }).then(repsonse => {
             console.log(repsonse)
             messageList.push({text: `Uploaded ${file.name}`, sentBy: "info", sentAt: new Date(), file: file})
+            fileAvailable ? null : fileAvailable = true
         }).catch(error => {
             console.log(error)
         })
@@ -66,7 +72,7 @@
     }   
 
     function searchDocument() {
-        socket.emit('send_message', search, false);
+        socket.emit('send_message', search, searchingEnabled);
         messageList.push({text: search, sentBy: "user", sentAt: new Date()})
         search = ''
         allowSend = false
@@ -112,7 +118,9 @@
             }
 
             }
-        }
+}
+
+    
             
 </script>
 
@@ -160,8 +168,15 @@
     <div class="border border-gray-300 rounded-3xl px-3 w-full flex flex-row items-center justify-between py-2 ">
         <p id="search" onkeydown={onkeyenter} contenteditable bind:innerText={search} class=" w-10/12 outline-none" ></p>
         <p class={search.length==0 ? ' block absolute -z-10 text-gray-500' : 'hidden'} >Börja din sökning</p>
-        <button class=" text-red-500 rounded-3xl h-9 self-end w-1/12" onclick={searchDocument}>Sök</button>
+        <button class=" text-red-500 rounded-3xl h-9 self-end w-1/12" onclick={searchDocument}>{searchingEnabled ? 'Sök' : 'Skicka'}</button>
     </div>
+    <button class=" rounded-3xl w-1/12 flex flex-row items-center justify-center" onclick={() => searchingEnabled=!searchingEnabled} >
+        {#if searchingEnabled}
+        <img alt="Search" src="/search.svg" class="w-6 h-6" />
+        {:else}
+        <img alt="Chat" src="/chat.svg" class="w-6 h-6" />
+        {/if}
+    </button>
     </div>
     </div>
    

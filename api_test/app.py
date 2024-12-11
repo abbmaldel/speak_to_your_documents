@@ -1,4 +1,5 @@
 from flask import Flask, render_template, request, jsonify, session
+from flask_cors import CORS
 from flask_socketio import SocketIO, emit, join_room, leave_room
 import os
 import PyPDF2
@@ -9,7 +10,8 @@ sessions = {}
 user_rooms = {}
 
 app = Flask(__name__)
-socketio = SocketIO(app, cors_allowed_origins="*")
+CORS(app, origins="*")
+socketio = SocketIO(app, cors_allowed_origins="*", cookie={'name': 'sid'})
 
 # This stores messages temporarily (could be replaced with a database)
 messages = []
@@ -29,28 +31,32 @@ def get_messages(SSID):
 
 @app.route("/documents/<SSID>", methods=["POST"])
 def documents(SSID):
+    print("SSID from request", SSID)
     if request.method == "POST":
         file = request.files["file"]
-
         _, file_extension = os.path.splitext(file.filename)
-
         match file_extension:
             case ".txt":
                 pass
+                return jsonify({"message": "success"}), 200
             case ".pdf":
                 pass
+                return jsonify({"message": "success"}), 200
             case _:
+                return jsonify({"message": "error"}), 400
                 raise ("Unkown filetype")
+        return jsonify({"message": "success"}), 200
 
 
 @socketio.on("connect")
-def on_connect():
-    session["SSID"] = str(uuid4())
+def on_connect(socket):
+    session["SSID"] = str(request.sid)
     user = session.get("SSID")
     print(session)
     if user:
         print("Request", request.sid)
         user_rooms[user] = request.sid  # Associate user with their WebSocket session ID
+        emit("cookie", {"SSID": user})
         join_room(user)
         print(f"{user} connected.")
 

@@ -1,6 +1,8 @@
 
 <script lang='ts'>
+    import { browser } from '$app/environment'; 
     import { io } from "socket.io-client";
+    let {data} = $props()
 
 
     const socket_url = "http://127.0.0.1:5000/"; // does not work at the moment, needs to be changed to the server's url
@@ -21,16 +23,45 @@
 
     
 
+    
+
     function uploadFile() {
         if(fileInput) {
             fileInput.click()    
         }
     }
 
+    function getCookie(cname: string) {
+  let name = cname + "=";
+  let decodedCookie = decodeURIComponent(document.cookie);
+  let ca = decodedCookie.split(';');
+  for(let i = 0; i <ca.length; i++) {
+    let c = ca[i];
+    while (c.charAt(0) == ' ') {
+      c = c.substring(1);
+    }
+    if (c.indexOf(name) == 0) {
+      return c.substring(name.length, c.length);
+    }
+  }
+  return "";
+}
+
     function onFileChange(event: Event) {
         const file = (event.target as HTMLInputElement).files?.[0]
-        if(file) {
+        const formData = new FormData()
+        formData.append('file', file as Blob, file?.name as string)
+        if(file && browser) {
+             fetch(socket_url + `documents/${getCookie('session')}`, {
+            method: 'POST',
+            body: formData
+        }).then(repsonse => {
+            console.log(repsonse)
             messageList.push({text: `Uploaded ${file.name}`, sentBy: "info", sentAt: new Date(), file: file})
+        }).catch(error => {
+            console.log(error)
+        })
+            
         }
     }   
 
@@ -40,15 +71,33 @@
         search = ''
         allowSend = false
     }
-   
+
+    
     socket.on("new_message", ({content}) => {
         messageList.push({text: content, sentBy: "ai", sentAt: new Date()})
         allowSend = true
     })
 
-    socket.on("connect", () => {
-  console.log("socket id", socket.id);
-});
+   
+    socket.on('cookie', (cookie) => {
+
+        console.log(cookie)
+        if(browser) {
+            let getTommorow = () => {
+                let date = new Date();
+                date.setDate(date.getDate() + 1);
+                return date;
+            }
+            document.cookie = `session=${cookie['SSID']}; expires=${getTommorow()}; path=/`
+        }
+    })
+
+    socket.on('disconnect', () => {
+        console.log('disconnected')
+        if(browser) {
+            document.cookie = `session=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/`
+        }
+    })
 
 
 

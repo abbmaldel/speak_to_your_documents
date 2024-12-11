@@ -35,20 +35,22 @@ def ping():
 def documents(SSID):
     if request.method == "POST":
         file = request.files["file"]
-
+        print(f"file upload sid:{SSID}")
         _, file_extension = os.path.splitext(file.filename)
-
+        print(file.filename)
         match file_extension:
             case ".txt":
                 database.vectorize_string(
                     file.read().decode("utf-8"), SSID, file.filename
                 )
+                print("vectorization done")
                 return jsonify({"message": "success"}), 200
             case ".pdf":
                 string = ""
                 for i in PyPDF2.PdfReader(file).pages:
                     string += i.extract_text()
                 database.vectorize_string(string, SSID, file.filename)
+                print("vectorization done")
                 return jsonify({"message": "success"}), 200
             case _:
                 return jsonify({"message": "bad request"}), 400
@@ -82,6 +84,7 @@ def on_disconnect():
 @socketio.on("send_message")
 def handle_send_message(data, look_up):
     sender = session.get("SSID")
+    print(f"send message sid:{sender}")
     if not sender:
         return jsonify({"error": "User not logged in"}), 400
     if not sender in sessions:

@@ -4,6 +4,7 @@
 <script lang='ts'>
     import { browser } from '$app/environment'; 
     import { io } from "socket.io-client";
+    import {marked} from 'marked'
     let {data} = $props()
 
 
@@ -134,28 +135,28 @@
         {#if i == messageList.length - 1}
         <div class={`flex flex-col   my-1 ${message.sentBy === "user" ? 'self-end items-end ' : message.sentBy === 'info' ? 'self-center items-center' :  'self-start items-start '}`} bind:this={lastElement}>
             <p class="text-gray-500 text-sm">{message.sentAt.toLocaleTimeString([],{timeStyle: "short"})}</p>
-        <div class={`rounded-3xl px-3 flex flex-row items-center justify-between py-2  ${message.sentBy === "user" ? ' bg-red-500 text-white' : message.sentBy === "info" ? 'text-sm text-gray-500' :  'bg-white-300 border border-black text-black'}`}>
+        <div class={`rounded-3xl px-3 flex flex-row items-center justify-between py-2 prose ${message.sentBy === "user" ? ' bg-red-500 text-white' : message.sentBy === "info" ? 'text-sm text-gray-500' :  'bg-white-300 border border-black text-black'}`}>
             {#if message.file}
             <p>
                 {message.text}
                 <a href={URL.createObjectURL(message.file)} download={message.file.name} class=" underline">View </a>
             </p>            
             {:else}
-            <p>{message.text}</p>
+            <p>{@html marked(message.text)}</p>
             {/if}
         </div>
         </div>
         {:else}
         <div class={`flex flex-col   my-1 ${message.sentBy === "user" ? 'self-end items-end ' : message.sentBy === 'info' ? 'self-center items-center' :  'self-start items-start '}`}>
             <p class="text-gray-500 text-sm">{message.sentAt.toLocaleTimeString([],{timeStyle: "short"})}</p>
-        <div class={`rounded-3xl px-3 flex flex-row items-center justify-between py-2  ${message.sentBy === "user" ? ' bg-red-500 text-white' : message.sentBy === "info" ? 'text-sm text-gray-500' :  'bg-white-300 border border-black text-black'}`}>
+        <div class={`rounded-3xl px-3 flex flex-row items-center justify-between py-2 prose  ${message.sentBy === "user" ? ' bg-red-500 text-white' : message.sentBy === "info" ? 'text-sm text-gray-500' :  'bg-white-300 border border-black text-black'}`}>
             {#if message.file}
             <p>
                 {message.text}
                 <a href={URL.createObjectURL(message.file)} download={message.file.name} class=" underline">View </a>
             </p>
             {:else}
-            <p>{message.text}</p>
+            <p>{@html marked(message.text)}</p>
             {/if}
         </div>
         </div>

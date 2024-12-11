@@ -11,7 +11,7 @@ user_rooms = {}
 
 app = Flask(__name__)
 CORS(app, origins="*")
-socketio = SocketIO(app, cors_allowed_origins="*", cookie={'name': 'sid'})
+socketio = SocketIO(app, cors_allowed_origins="*", cookie={"name": "sid"})
 
 # This stores messages temporarily (could be replaced with a database)
 messages = []

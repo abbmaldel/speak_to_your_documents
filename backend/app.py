@@ -26,6 +26,11 @@ def get_messages(SSID):
     return jsonify(sessions[SSID].messages)
 
 
+@app.route("/api/ping", methods=["GET"])
+def ping():
+    return "pong"
+
+
 @app.route("/documents/<SSID>", methods=["POST"])
 def documents(SSID):
     if request.method == "POST":
@@ -38,23 +43,28 @@ def documents(SSID):
                 database.vectorize_string(
                     file.read().decode("utf-8"), SSID, file.filename
                 )
+                return jsonify({"message": "success"}), 200
             case ".pdf":
                 string = ""
                 for i in PyPDF2.PdfReader(file).pages:
                     string += i.extract_text()
                 database.vectorize_string(string, SSID, file.filename)
+                return jsonify({"message": "success"}), 200
             case _:
+                return jsonify({"message": "bad request"}), 400
                 raise ("Unkown filetype")
+        return jsonify({"message": "success"}), 200
 
 
 @socketio.on("connect")
-def on_connect():
-    session["SSID"] = str(uuid4())
+def on_connect(socket):
+    session["SSID"] = str(request.sid)
     user = session.get("SSID")
     print(session)
     if user:
         print("Request", request.sid)
         user_rooms[user] = request.sid  # Associate user with their WebSocket session ID
+        emit("cookie", {"SSID": user})
         join_room(user)
         print(f"{user} connected.")
 

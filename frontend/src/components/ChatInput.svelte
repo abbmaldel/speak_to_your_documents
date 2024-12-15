@@ -1,11 +1,9 @@
 <script lang="ts">
-    let {fileInput, onFileChange, searchDocument } : {fileInput: HTMLElement | null, onFileChange: (event: Event) => void , searchDocument: (searchString: string, allowSend: boolean) => any} = $props()
+    let {fileInput, onFileChange, sendMessage, allowSend} : {fileInput: HTMLElement | null, onFileChange: (event: Event) => void , sendMessage: (searchString: string, searchingEnabled: boolean) => any, allowSend: boolean} = $props()
 
     // Message to be sent
     let search = $state('')
 
-    // False if the user is waiting for a response from the AI
-    let allowSend = $state(true)
 
     // True if the user is searching within a document, false if the user is sending a regular chat message
     let searchingEnabled = $state(false)
@@ -18,7 +16,7 @@
         event.preventDefault()
         if(allowSend && search.trim() !== "") {
 
-           searchDocument(search, allowSend)
+           sendMessage(search, searchingEnabled)
            search=""
             
             }
@@ -47,7 +45,7 @@ function uploadFile() {
     <div class="border border-gray-300 rounded-3xl px-3 w-full flex flex-row items-center justify-between py-2 ">
         <p id="search" onkeydown={onkeyenter} contenteditable bind:innerText={search} class=" w-10/12 outline-none" ></p>
         <p class={search.length==0 ? ' block absolute -z-10 text-gray-500' : 'hidden'} >Börja din sökning</p>
-        <button class="  disabled:text-gray-500 text-red-500 rounded-3xl h-9 self-end w-1/12" disabled={!(allowSend && search.trim() !== '')} onclick={() => {searchDocument(search, allowSend); search=""}}>{searchingEnabled ? 'Sök' : 'Skicka'}</button>
+        <button class="  disabled:text-gray-500 text-red-500 rounded-3xl h-9 self-end w-1/12" disabled={!(allowSend && search.trim() !== '')} onclick={() => {sendMessage(search, searchingEnabled); search=""}}>{searchingEnabled ? 'Sök' : 'Skicka'}</button>
     </div>
     <button class=" rounded-3xl w-1/12 flex flex-row items-center justify-center" onclick={() => searchingEnabled=!searchingEnabled} >
         {#if searchingEnabled}

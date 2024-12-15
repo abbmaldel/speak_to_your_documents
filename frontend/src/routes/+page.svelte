@@ -1,24 +1,26 @@
 
+<script module>
+    
 
+</script>
 
 <script lang='ts'>
     import { browser } from '$app/environment'; 
     import { io } from "socket.io-client";
     import {marked} from 'marked'
+    import type { Message } from '../components/ChatMessage.svelte'
+    import ChatMessage from '../components/ChatMessage.svelte'
+    import ChatInput from '../components/ChatInput.svelte';
     let {data} = $props()
 
 
     const socket_url = "http://127.0.0.1:5000/"; // does not work at the moment, needs to be changed to the server's url
     const socket = io(socket_url);
-    let search = $state('')
     let allowSend = $state(true)
     let lastElement = $state<null|HTMLElement>(null)
     let fileInput = $state<null|HTMLInputElement>(null)
     let fileAvailable = $state(false)
-    let searchingEnabled = $state(false)
-    let commandMode = $state(false)
-
-    let messageList = $state<{ text: string, sentBy: "user"|"ai"|"info", sentAt: Date, file?:  any}[]>([])
+    let messageList = $state<Message[]>([])   
 
 
     $effect(() => {
@@ -31,11 +33,7 @@
 
     
 
-    function uploadFile() {
-        if(fileInput) {
-            fileInput.click()    
-        }
-    }
+    
 
     function getCookie(cname: string) {
   let name = cname + "=";
@@ -72,10 +70,9 @@
         }
     }   
 
-    function searchDocument() {
+    function searchDocument(search: string, searchingEnabled: boolean) {
         socket.emit('send_message', search, searchingEnabled);
         messageList.push({text: search, sentBy: "user", sentAt: new Date()})
-        search = ''
         allowSend = false
     }
 
@@ -109,17 +106,7 @@
 
 
 
-    function onkeyenter(event: KeyboardEvent) {
-    console.log(event)
-    if (event.key === "Enter" && !event.shiftKey) {
-        event.preventDefault()
-        if(allowSend) {
-           searchDocument()
-            
-            }
-
-            }
-}
+  
 
     
             
@@ -133,52 +120,15 @@
         <div class="w-full h-[70vh] flex flex-col overflow-y-scroll auto scrollbar-hidden" >
         {#each messageList as message, i}
         {#if i == messageList.length - 1}
-        <div class={`flex flex-col   my-1 ${message.sentBy === "user" ? 'self-end items-end ' : message.sentBy === 'info' ? 'self-center items-center' :  'self-start items-start '}`} bind:this={lastElement}>
-            <p class="text-gray-500 text-sm">{message.sentAt.toLocaleTimeString([],{timeStyle: "short"})}</p>
-        <div class={`rounded-3xl px-3 flex flex-row items-center justify-between py-2 prose ${message.sentBy === "user" ? ' bg-red-500 text-white' : message.sentBy === "info" ? 'text-sm text-gray-500' :  'bg-white-300 border border-black text-black'}`}>
-            {#if message.file}
-            <p>
-                {message.text}
-                <a href={URL.createObjectURL(message.file)} download={message.file.name} class=" underline">View </a>
-            </p>            
-            {:else}
-            <p>{@html marked(message.text)}</p>
-            {/if}
-        </div>
+        <div class="w-full" bind:this={lastElement}>
+            <ChatMessage message={message}/>
         </div>
         {:else}
-        <div class={`flex flex-col   my-1 ${message.sentBy === "user" ? 'self-end items-end ' : message.sentBy === 'info' ? 'self-center items-center' :  'self-start items-start '}`}>
-            <p class="text-gray-500 text-sm">{message.sentAt.toLocaleTimeString([],{timeStyle: "short"})}</p>
-        <div class={`rounded-3xl px-3 flex flex-row items-center justify-between py-2 prose  ${message.sentBy === "user" ? ' bg-red-500 text-white' : message.sentBy === "info" ? 'text-sm text-gray-500' :  'bg-white-300 border border-black text-black'}`}>
-            {#if message.file}
-            <p>
-                {message.text}
-                <a href={URL.createObjectURL(message.file)} download={message.file.name} class=" underline">View </a>
-            </p>
-            {:else}
-            <p>{@html marked(message.text)}</p>
-            {/if}
-        </div>
-        </div>
+        <ChatMessage message={message} />
         {/if}
     {/each}
     </div>
-    <div class="w-full flex flex-row items-center">
-    <input type="file" id="file" name="file" accept=".pdf" class="hidden" bind:this={fileInput}  onchange={onFileChange}/>
-    <button class=" text-gray-500 rounded-3xl h-9 w-1/12" onclick={() => uploadFile()} >+</button>
-    <div class="border border-gray-300 rounded-3xl px-3 w-full flex flex-row items-center justify-between py-2 ">
-        <p id="search" onkeydown={onkeyenter} contenteditable bind:innerText={search} class=" w-10/12 outline-none" ></p>
-        <p class={search.length==0 ? ' block absolute -z-10 text-gray-500' : 'hidden'} >Börja din sökning</p>
-        <button class=" text-red-500 rounded-3xl h-9 self-end w-1/12" onclick={searchDocument}>{searchingEnabled ? 'Sök' : 'Skicka'}</button>
-    </div>
-    <button class=" rounded-3xl w-1/12 flex flex-row items-center justify-center" onclick={() => searchingEnabled=!searchingEnabled} >
-        {#if searchingEnabled}
-        <img alt="Search" src="/search.svg" class="w-6 h-6" />
-        {:else}
-        <img alt="Chat" src="/chat.svg" class="w-6 h-6" />
-        {/if}
-    </button>
-    </div>
+    <ChatInput fileInput={fileInput} onFileChange={onFileChange} searchDocument={searchDocument} />
     </div>
    
 </div>

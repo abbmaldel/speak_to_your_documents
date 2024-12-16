@@ -1,9 +1,4 @@
 
-<script module>
-    
-
-</script>
-
 <script lang='ts'>
     import { browser } from '$app/environment'; 
     import { io } from "socket.io-client";
@@ -133,7 +128,6 @@
     </div>
     <ChatInput fileInput={fileInput} onFileChange={onFileChange} sendMessage={sendMessage} allowSend={allowSend} />
     </div>
-   
 </div>
 </div>
 
